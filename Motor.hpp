@@ -5,6 +5,10 @@
 #define STEP_PIN_H 5
 #define DIR_PIN_H 6
 
+#define MIN_STEP_MIC 450
+#define MAX_STEP_MIC 4000
+#define MAX_THRUST 100
+
 enum DIRECTION { BACKWARDS, FORWARDS};
 
 struct MOTOR{
@@ -12,8 +16,11 @@ struct MOTOR{
     int stepPIN;
     int dirPIN;
     int direction;
-    int ms_delay;
+    int step_mic;
     
     void motorSETUP(int step, int dir);
-    void motorDrive();
+    void dirControl(double thrust);
+    void motorDrive(double thrust);
 };
+
+
