@@ -6,50 +6,118 @@ void GYRO::gyroSetup(){
     Wire.begin();
     
     //Wake up gyro
-    Wire.beginTransmission(GYRO_ADDRESS);
-    Wire.write(0x6B);
-    Wire.write(0x00);
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(PWR_MGMT_1);
+    Wire.write(RESET_VALUE);
     Wire.endTransmission();
     
-    //Gyro
-    Wire.beginTransmission(GYRO_ADDRESS);
-    Wire.write(0x1B);
-    Wire.write(0x00);
+    //Gyro config and +/- 250 deg/s
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(GYRO_CONFIG);
+    Wire.write(ANGLE_RANGE);
     Wire.endTransmission();
     
-    //Accelerometer
-    Wire.beginTransmission(GYRO_ADDRESS);
-    Wire.write(0x1C);
-    Wire.write(0x08);
+    //Accelerometer config and +/- 4g
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(ACCEL_CONFIG);
+    Wire.write(ACCEL_RANGE);
     Wire.endTransmission();
     
-    //Filter
-    Wire.beginTransmission(GYRO_ADDRESS);
-    Wire.write(0x1A);
-    Wire.write(0x03);
+    //Filter config and 44Hz bandwidth
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(CONFIG);
+    Wire.write(FILTER_BDW);
     Wire.endTransmission();
     
     pinMode(GYRO_SDA, OUTPUT);
     pinMode(GYRO_SCL, OUTPUT);
+
+    accel_pitch = 0.0;
+    pitch = 0.0;
+    yaw = 0.0;
+    pitch_vel = 0.0;
+    yaw_vel = 0.0;
+    pitch_vel_offset = 0.0;
+    yaw_vel_offset = 0.0;
+    accelX = 0.0;
+    accelZ = 0.0;
     
-    pitch_calib = 0.0;
-    yaw_calib = 0.0;
 }
 
 void GYRO::gyroCalibration(){
+    
     for (unsigned int i = 0; i < 500; i++){
-        Wire.beginTransmission(GYRO_ADDRESS);
-        Wire.write(0x43);
+        Wire.beginTransmission(SIGNAL_PATH_RESET);
+        Wire.write(GYRO_XOUT_H);
         Wire.endTransmission();
-        Wire.requestFrom(GYRO_ADDRESS, 4);
+        Wire.requestFrom(SIGNAL_PATH_RESET, 4);
         
-        yaw_calib += Wire.read()<<8|Wire.read();
-        pitch_calib += Wire.read()<<8|Wire.read();
+        yaw_vel_offset += Wire.read()<<8|Wire.read();
+        pitch_vel_offset += Wire.read()<<8|Wire.read();
         
         delayMicroseconds(3700);
     }
     
-    yaw_calib /= 500;
-    pitch_calib /= 500;
+    yaw_vel_offset /= 500;
+    pitch_vel_offset /= 500;
     
+}
+
+void GYRO::accelAngleCalc(){
+    
+   for (unsigned int i = 0; i < 500; i++){
+        Wire.beginTransmission(SIGNAL_PATH_RESET);
+        Wire.write(ACCEL_XOUT_H);
+        Wire.endTransmission();
+        Wire.requestFrom(SIGNAL_PATH_RESET, 2);
+        accelX += Wire.read()<<8|Wire.read();
+        
+        Wire.beginTransmission(SIGNAL_PATH_RESET);
+        Wire.write(ACCEL_ZOUT_H);
+        Wire.endTransmission();
+        Wire.requestFrom(SIGNAL_PATH_RESET, 2);
+        accelZ += Wire.read()<<8|Wire.read();
+        
+        delayMicroseconds(3700);
+    }
+    
+    accelX /= 500;
+    accelZ /= 500;
+    accelX /= 8192;                                                                 //Converts to number of g's
+    accelZ /= 8192;
+    
+    if (abs(accelX) <= 0.01) accelZ = 0.01;                                         //Makes sure not deviding by zero
+    
+    pitch = atan(accelZ / accelX);
+    pitch = pitch * (180 / pi);                                                            //Convert pitch-angle to degrees
+}
+
+void GYRO::updateAngularMotion(){
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(GYRO_XOUT_H);
+    Wire.endTransmission();
+    Wire.requestFrom(SIGNAL_PATH_RESET, 4);
+    
+    yaw_vel = ((Wire.read()<<8|Wire.read()) - yaw_vel_offset)/131.0;                //Converting to deg/s
+    pitch_vel = ((Wire.read()<<8|Wire.read()) - pitch_vel_offset)/131.0;
+    
+    yaw += yaw_vel * 0.004;
+    pitch += pitch_vel * 0.004;
+    
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(ACCEL_XOUT_H);
+    Wire.endTransmission();
+    Wire.requestFrom(SIGNAL_PATH_RESET, 2);
+    accelX = Wire.read()<<8|Wire.read();
+    
+    Wire.beginTransmission(SIGNAL_PATH_RESET);
+    Wire.write(ACCEL_ZOUT_H);
+    Wire.endTransmission();
+    Wire.requestFrom(SIGNAL_PATH_RESET, 2);
+    accelZ = Wire.read()<<8|Wire.read();
+    
+    accel_pitch = atan(accelZ / accelX);
+    accel_pitch = accel_pitch * (180 / pi);
+    
+    pitch = pitch * 0.995 + accel_pitch * 0.005;                                  //Countering the drift
 }

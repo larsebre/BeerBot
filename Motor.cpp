@@ -1,7 +1,7 @@
 #include "Motor.hpp"
 
 
-void MOTOR::motorSETUP(int step, int dir) {
+void MOTOR::motorSetup(int step, int dir) {
     stepPIN = step;
     dirPIN = dir;
     direction = DIRECTION::FORWARDS;
@@ -32,7 +32,7 @@ void MOTOR::motorDrive(double thrust){
     dirControl(thrust);
     digitalWrite(dirPIN,direction);
     
-    step_mic = (int)(MIN_STEP_MIC - MAX_STEP_MIC) * (thrust/MAX_THRUST) + MAX_STEP_MIC;
+    step_mic = (int)((MIN_STEP_MIC - MAX_STEP_MIC) * (thrust/MAX_THRUST) + MAX_STEP_MIC);
     if (step_mic > MAX_STEP_MIC) step_mic = MAX_STEP_MIC;
     
     digitalWrite(stepPIN,HIGH);

@@ -18,7 +18,7 @@ struct MOTOR{
     int direction;
     int step_mic;
     
-    void motorSETUP(int step, int dir);
+    void motorSetup(int step, int dir);
     void dirControl(double thrust);
     void motorDrive(double thrust);
 };

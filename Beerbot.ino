@@ -1,37 +1,40 @@
 #include "Motor.hpp"
+#include "Gyro.hpp"
 
 //Creating objects
 volatile uint8_t counter = 0;
 volatile uint8_t timerAlert = LOW;
 
 MOTOR motL;
-
+GYRO gyro;
+long loop_timer;
 
 
 void setup() {
-  OCR0A = 0xAF;           // set up interrupt for 1 ms each time
-  TIMSK0 |= _BV(OCIE0A);
   
-  motL.motorSETUP(STEP_PIN_L, DIR_PIN_L);
+  motL.motorSetup(STEP_PIN_L, DIR_PIN_L);
+  gyro.gyroSetup();
+  gyro.gyroCalibration();
+  gyro.accelAngleCalc();
+
+  loop_timer = 0;
 }
 
-SIGNAL(TIMER0_COMPA_vect){
-  counter++;
-  if (counter == 4)
-  {
-    timerAlert = HIGH;   // only fire every 4th time
-    counter = 0;
-  }
-}
+int printer = 0;
 
 void loop() {
 
-  if (timerAlert) {
-    //Calculate thrust
-
-    timerAlert = LOW;
+  gyro.updateAngularMotion();
+  
+  if ((printer%30) == 0){
+    Serial.print(gyro.pitch);
+    Serial.print('\n');
+    printer = 0;
+  }
+  printer++;
+  
+  while(micros() - loop_timer < 4000){
     
   }
-  
-  motL.motorDrive(thrust);
+  loop_timer = micros();
 }
