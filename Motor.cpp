@@ -4,40 +4,57 @@
 void MOTOR::motorSetup(int step, int dir) {
     stepPIN = step;
     dirPIN = dir;
-    direction = DIRECTION::FORWARDS;
-    step_mic = 0;
+    Direction = DIRECTION::FORWARDS;
+    pulse_counter = 0;
+    step_pin_on = true;
     pinMode(stepPIN, OUTPUT);
     pinMode(dirPIN, OUTPUT);
+    pinMode(QUARTER_STEP, OUTPUT);
+    digitalWrite(QUARTER_STEP, HIGH);
 }
 
-void MOTOR::dirControl(double thrust){
+void MOTOR::dirControl(double u){
     
     if (dirPIN == DIR_PIN_L){
-        if (thrust > 0){
-            direction = DIRECTION::FORWARDS;
-        }else if (thrust < 0){
-            direction = DIRECTION::BACKWARDS;
+        if (u > 0){
+            Direction = DIRECTION::FORWARDS;
+        }else if (u < 0){
+            Direction = DIRECTION::BACKWARDS;
         }
     }else{
-        if (thrust < 0){
-            direction = DIRECTION::FORWARDS;
-        }else if (thrust > 0){
-            direction = DIRECTION::BACKWARDS;
+        if (u < 0){
+            Direction = DIRECTION::FORWARDS;
+        }else if (u > 0){
+            Direction = DIRECTION::BACKWARDS;
         }
     }
 }
 
-void MOTOR::motorDrive(double thrust){
+void MOTOR::motorDrive(int PC_val){
     
-    dirControl(thrust);
-    digitalWrite(dirPIN,direction);
+    /*dirControl(u);
+    digitalWrite(dirPIN,Direction);
+
+    u = abs(u);
+    if (u > 5) u = 5;
+    //int PC_val = (-125 * u) + 212.5;
+    int PC_val = 31.25/u;*/
+
+    if (PC_val <= 1000){
+      if (step_pin_on){
+        if (pulse_counter == PC_val){
+          digitalWrite(stepPIN,LOW);
+          step_pin_on = false;
+          pulse_counter = 0;
+        }
+      }else{
+        if (pulse_counter == PC_val){
+          digitalWrite(stepPIN,HIGH);
+          step_pin_on = true;
+          pulse_counter = 0;
+        }
+      }
     
-    step_mic = (int)((MIN_STEP_MIC - MAX_STEP_MIC) * (thrust/MAX_THRUST) + MAX_STEP_MIC);
-    if (step_mic > MAX_STEP_MIC) step_mic = MAX_STEP_MIC;
-    
-    digitalWrite(stepPIN,HIGH);
-    delayMicroseconds(step_mic);
-    digitalWrite(stepPIN,LOW);
-    delayMicroseconds(step_mic);
-    
+      pulse_counter++; 
+    }
 }

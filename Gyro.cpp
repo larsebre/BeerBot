@@ -2,9 +2,7 @@
 
 
 void GYRO::gyroSetup(){
-    Serial.begin(9600);
-    Wire.begin();
-    
+
     //Wake up gyro
     Wire.beginTransmission(SIGNAL_PATH_RESET);
     Wire.write(PWR_MGMT_1);
@@ -36,7 +34,9 @@ void GYRO::gyroSetup(){
     pitch = 0.0;
     yaw = 0.0;
     pitch_vel = 0.0;
+    pitch_vel_prev = 0.0;
     yaw_vel = 0.0;
+    yaw_vel_prev = 0.0;
     pitch_vel_offset = 0.0;
     yaw_vel_offset = 0.0;
     accelX = 0.0;
@@ -45,7 +45,9 @@ void GYRO::gyroSetup(){
 }
 
 void GYRO::gyroCalibration(){
-    
+
+    Serial.print("Calibrating...");
+    Serial.print('\n');
     for (unsigned int i = 0; i < 500; i++){
         Wire.beginTransmission(SIGNAL_PATH_RESET);
         Wire.write(GYRO_XOUT_H);
@@ -101,8 +103,8 @@ void GYRO::updateAngularMotion(){
     yaw_vel = ((Wire.read()<<8|Wire.read()) - yaw_vel_offset)/131.0;                //Converting to deg/s
     pitch_vel = ((Wire.read()<<8|Wire.read()) - pitch_vel_offset)/131.0;
     
-    yaw += yaw_vel * 0.004;
-    pitch += pitch_vel * 0.004;
+    yaw += (yaw_vel + yaw_vel_prev) * 0.5 * 0.004;
+    pitch += (pitch_vel + pitch_vel_prev) * 0.5 * 0.004;
     
     Wire.beginTransmission(SIGNAL_PATH_RESET);
     Wire.write(ACCEL_XOUT_H);
@@ -119,5 +121,8 @@ void GYRO::updateAngularMotion(){
     accel_pitch = atan(accelZ / accelX);
     accel_pitch = accel_pitch * (180 / pi);
     
-    pitch = pitch * 0.995 + accel_pitch * 0.005;                                  //Countering the drift
+    pitch = pitch * 0.995 + accel_pitch * 0.005;                                       //Countering the drift
+    
+    pitch_vel_prev = pitch_vel;
+    yaw_vel_prev = yaw_vel;
 }

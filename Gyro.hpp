@@ -32,7 +32,9 @@ struct GYRO{
     double yaw;
     
     double pitch_vel;
+    double pitch_vel_prev;
     double yaw_vel;
+    double yaw_vel_prev;
     
     double pitch_vel_offset;
     double yaw_vel_offset;

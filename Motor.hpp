@@ -4,6 +4,7 @@
 #define DIR_PIN_L 4
 #define STEP_PIN_H 5
 #define DIR_PIN_H 6
+#define QUARTER_STEP 2
 
 #define MIN_STEP_MIC 450
 #define MAX_STEP_MIC 4000
@@ -15,12 +16,12 @@ struct MOTOR{
 
     int stepPIN;
     int dirPIN;
-    int direction;
-    int step_mic;
+    int Direction;
+
+    int pulse_counter;
+    bool step_pin_on;
     
     void motorSetup(int step, int dir);
-    void dirControl(double thrust);
-    void motorDrive(double thrust);
+    void dirControl(double u);
+    void motorDrive(int PC_val);
 };
-
-
