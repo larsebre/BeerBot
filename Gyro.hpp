@@ -2,8 +2,10 @@
 #include <Wire.h>
 #include <math.h>
 
-#define GYRO_SDA 4
-#define GYRO_SCL 5
+#define GYRO_SDA 2
+#define GYRO_SCL 3
+#define LED_PIN_R 12
+#define LED_PIN_G 11
 
 #define SIGNAL_PATH_RESET 0x68
 #define PWR_MGMT_1 0x6B
@@ -21,7 +23,6 @@
 #define TIME_STEP 0.004;
 #define pi  3.141
 #define OFFSET_ACCEL 12
-
 
 
 struct GYRO{

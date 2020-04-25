@@ -2,8 +2,8 @@
 
 #define STEP_PIN_L 3
 #define DIR_PIN_L 4
-#define STEP_PIN_H 5
-#define DIR_PIN_H 6
+#define STEP_PIN_H 6
+#define DIR_PIN_H 7
 #define QUARTER_STEP 2
 
 #define MIN_STEP_MIC 450

@@ -32,13 +32,6 @@ void MOTOR::dirControl(double u){
 
 void MOTOR::motorDrive(int PC_val){
     
-    /*dirControl(u);
-    digitalWrite(dirPIN,Direction);
-
-    u = abs(u);
-    if (u > 5) u = 5;
-    //int PC_val = (-125 * u) + 212.5;
-    int PC_val = 31.25/u;*/
 
     if (PC_val <= 1000){
       if (step_pin_on){

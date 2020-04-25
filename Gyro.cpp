@@ -46,9 +46,28 @@ void GYRO::gyroSetup(){
 
 void GYRO::gyroCalibration(){
 
+      pinMode(LED_PIN_R, OUTPUT);
+      pinMode(LED_PIN_G, OUTPUT);
+      digitalWrite(LED_PIN_R, LOW);
+      digitalWrite(LED_PIN_G, LOW);
+
     Serial.print("Calibrating...");
     Serial.print('\n');
+
+    bool light = false;
+    
     for (unsigned int i = 0; i < 500; i++){
+
+        if (i%15 == 0){
+          if (light == false){
+            digitalWrite(LED_PIN_G, HIGH);
+            light = true;
+          }else{
+            digitalWrite(LED_PIN_G, LOW);
+            light = false;
+          }
+        }
+        
         Wire.beginTransmission(SIGNAL_PATH_RESET);
         Wire.write(GYRO_XOUT_H);
         Wire.endTransmission();
@@ -62,7 +81,7 @@ void GYRO::gyroCalibration(){
     
     yaw_vel_offset /= 500;
     pitch_vel_offset /= 500;
-    
+    digitalWrite(LED_PIN_G, LOW);
 }
 
 void GYRO::accelAngleCalc(){
