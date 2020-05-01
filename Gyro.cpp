@@ -140,7 +140,7 @@ void GYRO::updateAngularMotion(){
     accel_pitch = atan(accelZ / accelX);
     accel_pitch = accel_pitch * (180 / pi);
     
-    pitch = pitch * 0.995 + accel_pitch * 0.005;                                       //Countering the drift
+    pitch = pitch * 0.9992 + accel_pitch * 0.0008;                                       //Countering the drift
     
     pitch_vel_prev = pitch_vel;
     yaw_vel_prev = yaw_vel;

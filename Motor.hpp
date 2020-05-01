@@ -19,6 +19,7 @@ struct MOTOR{
     int Direction;
 
     int pulse_counter;
+    long pulse_total;
     bool step_pin_on;
     
     void motorSetup(int step, int dir);
