@@ -8,35 +8,39 @@ struct PID{
     double Kp_pitch;
     double Kd_pitch;
     double Ki_pitch;
+    double K_internal;
+
+    double Kp_vel;
+    double Ki_vel;
+    double Kd_vel;
     
-    double Kp_position;
-    double Kd_position;
-    double Ki_position;
-    
-    double pitch_ref;
     double pitch_ref_const;
-    double position_ref;            //Meters
+    double pitch_ref;
+
+    double velocity_ref;
+    double velocity_pulses;
     
     double P_thrust;
     double I_thrust;
     double D_thrust;
-    
-    double P_position;
-    double I_position;
-    double D_position;
+
+    double P_pitch;
+    double I_pitch;
+    double D_pitch;
     
     double error_pitch;
-    double error_prev_pitch;
-    
-    double error_position;
-    double error_prev_position;
+    double error_pitch_prev;
+
+    double error_vel;
+    double error_vel_prev;
+
+    long pulses;
+    long pulses_prev;
     
     double sum_thrust;
     
     int antiwindup_pitch;
-    int antiwindup_position;
     
-    void pidSetup(double P_pitch, double I_pitch, double D_pitch, double P_position, double I_position, double D_position);
-    void calcThrust(double gyro_pitch, double gyro_pitch_vel);
-    void calcPositionThrust(double pulse_total);
+    void pidSetup(double P_pitch, double I_pitch, double D_pitch, double K_2, double P_vel, double I_vel, double D_vel);
+    void calcThrust(double gyro_pitch, double gyro_pitch_vel, long pulse_total);
 };

@@ -32,8 +32,8 @@ void setup(void) {
   gyro.gyroSetup();
   gyro.gyroCalibration();
   gyro.accelAngleCalc();
-  pid.pidSetup(0.33, 0.0001, 0.01, 20.0, 0.0, 20.0);              //Without beer: P = 0.285, I = 0.0002, D = 0.0075
-                                                                //With full beer: P = 0.33, I = 0.0001, D = 0.01
+  pid.pidSetup(0.30, 0.0, 0.0, 0.0135, 0.4, 0.0, 0.0);                        //With beer: P = 31.0, I = 0.0, D = 0.019, 0.009
+                                                                
   //Interrupt setup every 20us
   TCCR2A = 0;
   TCCR2B = 0;
@@ -63,8 +63,7 @@ void loop(void) {
   printer++;
 
   gyro.updateAngularMotion();
-  pid.calcPositionThrust(motR.pulse_total);
-  pid.calcThrust(gyro.pitch, gyro.pitch_vel);
+  pid.calcThrust(gyro.pitch, gyro.pitch_vel, motL.pulse_total);
   
   //Driving the motor
   motL.dirControl(pid.sum_thrust);
