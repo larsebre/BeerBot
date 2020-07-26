@@ -21,8 +21,18 @@ struct MOTOR{
     int pulse_counter;
     long pulse_total;
     bool step_pin_on;
+
+    int pulse;
+    int pulse_prev;
+    int elements = 20;
+
+    double vel_array[20];
+    double velocity;
+    double test;
     
     void motorSetup(int step, int dir);
     void dirControl(double u);
     void motorDrive(int PC_val);
+    void pushData(double value, int numbElements);
+    double getAverage();
 };

@@ -13,8 +13,31 @@ void MOTOR::motorSetup(int step, int dir) {
     digitalWrite(QUARTER_STEP, HIGH);
 }
 
+
+void MOTOR::pushData(double value, int numbElements){
+
+  for (int i = (numbElements - 1); i >= 0; i--){
+    if (i == 0){
+      vel_array[i] = value;
+    }else{
+      vel_array[i] = vel_array[i - 1];
+    }
+  }
+}
+double MOTOR::getAverage(){
+  double sum = 0.0;
+
+  for (int i = 0; i < elements; i++){
+    sum += vel_array[i];
+  }
+
+  return (sum / elements);
+}
+
+
 void MOTOR::dirControl(double u){
-    
+
+    pulse = pulse_total;
     if (dirPIN == DIR_PIN_L){
         if (u > 0){
             Direction = DIRECTION::FORWARDS;
@@ -28,12 +51,16 @@ void MOTOR::dirControl(double u){
             Direction = DIRECTION::BACKWARDS;
         }
     }
+
+    pushData((((pulse - pulse_prev) * ((0.065 * 3.14) / 800)) / 0.004) , 10);
+    velocity =  getAverage();
+    
+    pulse_prev = pulse;   
 }
 
 void MOTOR::motorDrive(int PC_val){
-    
 
-    if ((PC_val <= 2000) && (PC_val >= 6)){
+    if ((PC_val <= 350) && (PC_val >= 6)){       //2000
       if (step_pin_on){
         if (pulse_counter >= PC_val){
           digitalWrite(stepPIN,LOW);
