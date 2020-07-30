@@ -24,6 +24,7 @@ void MOTOR::pushData(double value, int numbElements){
     }
   }
 }
+
 double MOTOR::getAverage(){
   double sum = 0.0;
 
@@ -52,7 +53,7 @@ void MOTOR::dirControl(double u){
         }
     }
 
-    pushData((((pulse - pulse_prev) * ((0.065 * 3.14) / 800)) / 0.004) , 10);
+    pushData((((pulse - pulse_prev) * ((0.065 * 3.14) / 800)) / 0.004) , 20);
     velocity =  getAverage();
     
     pulse_prev = pulse;   

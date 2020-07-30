@@ -15,7 +15,7 @@
 #define ACCEL_CONFIG 0x1C
 #define CONFIG 0x1A
 #define ACCEL_RANGE 0x08
-#define FILTER_BDW 0x05           //For bigger bandwidth 0x03
+#define FILTER_BDW 0x04           //For bigger bandwidth 0x03
 #define GYRO_XOUT_H 0x43
 #define ACCEL_XOUT_H 0x3B
 #define ACCEL_ZOUT_H 0x3F
@@ -36,7 +36,7 @@ struct GYRO{
     double pitch_vel_prev;
     double yaw_vel;
     double yaw_vel_prev;
-    
+
     double pitch_vel_offset;
     double yaw_vel_offset;
     double accelX;
@@ -45,6 +45,5 @@ struct GYRO{
     void gyroSetup();
     void gyroCalibration();
     void accelAngleCalc();
-    void updateAngularMotion();
-    
+    void updateAngularMotion(); 
 };
