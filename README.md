@@ -7,6 +7,6 @@ The segway is controlled by changing the linear velocity and yaw angle velocity.
 
 Really interesting and fun project!
 
-Watch video here!
+Click the picture to watch the video:
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/URvtSx9A38s/0.jpg)](https://www.youtube.com/watch?v=URvtSx9A38s)
